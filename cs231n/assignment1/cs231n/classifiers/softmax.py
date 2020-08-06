@@ -22,14 +22,32 @@ def softmax_loss_naive(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
-
+  y_pred = np.matmul(X, W)
+  
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
-  #############################################################################
-  pass
+  ############################################################################
+  r_w = np.sum(np.square(W))
+  for i in range(y_pred.shape[0]):
+      y_act = np.zeros((y_pred.shape[1]))
+      y_act[y[i]-1] = 1
+      y_act = y_act.flatten()
+      unnorm = y_pred[i] - np.max(y_pred[i]) # Stable softmax
+      h_i = np.exp(unnorm[y[i]-1])/np.sum(np.exp(unnorm))
+      l_i = h_i + (reg * r_w)
+      loss += l_i
+      
+      print 'input=> ', (X[np.newaxis, i]).T.shape
+      print "exp=> ",np.exp(unnorm), ' shape=> ', np.exp(unnorm).shape, (np.exp(unnorm)[:, np.newaxis]).shape
+      print "y=> ",y_act, ' shape=> ', y_act.shape, (y_act[:, np.newaxis]).shape
+      print "diff=> ", ((np.exp(unnorm)[:, np.newaxis]) - (y_act[:, np.newaxis])).flatten(), ' shape=> ', ((np.exp(unnorm)[:, np.newaxis]) - (y_act[:, np.newaxis])).shape
+      dW += np.matmul(X[np.newaxis, i], (((np.exp(unnorm)[:, np.newaxis]) - (y_act[:, np.newaxis])).flatten()).T)
+      
+      
+  loss = loss/y_pred.shape[0]
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
