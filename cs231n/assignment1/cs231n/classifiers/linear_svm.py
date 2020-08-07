@@ -45,6 +45,7 @@ def svm_loss_naive(W, X, y, reg):
 
   # Add regularization to the loss.
   loss += 0.5 * reg * np.sum(W * W)
+  dW += 2 * reg * W 
 
   #############################################################################
   # TODO:                                                                     #
@@ -93,7 +94,14 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  binary_rep = np.zeros(margins.shape)
+  binary_rep[margins > 0] = 1
+  binary_rep[np.arange(X.shape[0]), [y]] = - np.sum(binary_rep, axis=1)
+
+  dW = X.T.dot(binary_rep)
+  dW /= X.shape[0] 
+  dW += 2 * reg * W 
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
